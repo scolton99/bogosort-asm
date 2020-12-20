@@ -13,5 +13,5 @@
 	<createSlaveProjects value=""/>
 	<templateProperties value="id=com.ti.ccstudio.project.templates.emptyAssemblyOnly_msp430,isAssemblyOnly=true"/>
 	<filesToOpen value="main.asm"/>
-	<isTargetManual value="true"/>
+	<isTargetManual value="false"/>
 </projectOptions>

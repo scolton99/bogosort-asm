@@ -7,7 +7,8 @@
 			.global MOD,SHUFFLE,RAND_UPD,LED1_ON,LED0_ON,LED1_OFF,LED0_OFF
           	.data
 ARR_LEN		.byte	5
-ARR			.word	0, 0, 0, 0, 0
+ARR			.word	6, 1, 3, 4, 2
+ARR_OUT		.word	0, 0, 0, 0, 0
 
 ;-------------------------------------------------------------------------------
             .def    RESET                   ; Export program entry-point to
@@ -54,7 +55,11 @@ StopWDT     mov.w   #WDTPW|WDTHOLD,&WDTCTL  				; Stop watchdog timer
 ;-------------------------------------------------------------------------------
 ; Main loop here
 ;-------------------------------------------------------------------------------
-			mov.w	#ARR,r5
+			mov.w	&ARR_LEN,r5
+			mov.w	#ARR,r6
+			mov.w	#ARR_OUT,r7
+			call	#COPY
+			mov.w	#ARR_OUT,r5
 			mov.w	&ARR_LEN,r6
 			jmp		CHK
 RUN			call	#LED0_ON
@@ -101,6 +106,31 @@ CS_RF		clrz					; Return false
 CS_ND		pop.w	r7
 			pop.w	r6
 			pop.w 	r5
+			ret
+			.endasmfunc
+
+			;; COPY: copy n WORD values from ptr1 to ptr2
+			;;
+			;; Arguments: r5 - n, r6 - ptr1, r7 - ptr2
+			;; Uses: none
+			;;
+			;; Internal: none
+			.asmfunc
+COPY		push.w	r5
+			push.w	r6
+			push.w	r7
+
+			jmp		COPY_CHK
+COPY_ST		mov.w	@r6,0(r7)
+			incd.w	r6
+			incd.w	r7
+			dec.w	r5
+COPY_CHK	tst.w	r5
+			jnz		COPY_ST
+
+			pop.w	r7
+			pop.w	r6
+			pop.w	r5
 			ret
 			.endasmfunc
 

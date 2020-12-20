@@ -61,13 +61,9 @@ RAND_RANGE	;; RAND_RANGE: get a random number in a range [a, b)
 			;; Internal:
 			.asmfunc
 GEN_RAND	cmp.w 	#0,&CRAND		; If we don't have a random value generated yet,
-			jnz		GEN_RDY			; wait until one has been.
-			bis.w	#CCIE,&TA2CCTL0	; Enable interrupts on timer
-GEN_CMP		cmp.w	#0,&CRAND		; Check again
-			jz		GEN_CMP			; Repeat until we have a number
+			jz		GEN_RAND		; wait until one has been.
 GEN_RDY		mov.w	&CRAND,r4
 			mov.w	#0,&CRAND		; Clear CRAND so that it will start generating again
-			bis.w	#CCIE,&TA2CCTL0	; Re-enable timer interupts
 			ret
 			.endasmfunc
 
@@ -101,7 +97,6 @@ RAND_UPD	push.w 	r4
 			xor.b	&UPDTICK,&UPDTICK	; Otherwise, clear counter and update the random value
 			mov.w	&TRAND,&CRAND
 			bic.w	#0x8000,&CRAND		; Make number positive
-			bic.w	#CCIE,&TA2CCTL0		; Disable timer interrupts
 
 RAND_UPDND	pop.w 	r5
 			pop.w 	r4
