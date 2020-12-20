@@ -135,6 +135,7 @@ COPY_CHK	tst.w	r5
 			.endasmfunc
 
 AEND		nop
+			bic.w	#CCIE,&TA2CCTL0
 			call	#LED0_ON
 			call	#LED1_ON
 			jmp 	AEND
