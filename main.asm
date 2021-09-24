@@ -6,9 +6,9 @@
             .cdecls C,LIST,"msp430.h"       ; Include device header file
 			.global MOD,SHUFFLE,RAND_UPD,LED1_ON,LED0_ON,LED1_OFF,LED0_OFF
           	.data
-ARR_LEN		.byte	5
-ARR			.word	6, 1, 3, 4, 2
-ARR_OUT		.word	0, 0, 0, 0, 0
+ARR_LEN		.byte	9
+ARR			.word	6, 1, 3, 4, 2, 9, 8, 5, 7
+ARR_OUT		.word	0, 0, 0, 0, 0, 0, 0, 0, 0
 
 ;-------------------------------------------------------------------------------
             .def    RESET                   ; Export program entry-point to
@@ -45,6 +45,9 @@ StopWDT     mov.w   #WDTPW|WDTHOLD,&WDTCTL  				; Stop watchdog timer
 			and.w 	#~LOCKLPM5,&PM5CTL0						; Turn off high-impedance mode
 			mov.w	#0,&P1OUT
 			mov.w	#BIT1|BIT0,&P1DIR						; Setup LED output
+
+            mov.w   #NWAITS_1|FRCTLPW,&FRCTL0               ; Enable FRAM wait states, faster clock
+			mov.w   #DCOFSEL_4|DCORSEL,&CSCTL1              ; 16MHz mode
 
 			; Array setup
 			mov.w 	#6,&ARR
