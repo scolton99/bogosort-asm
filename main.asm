@@ -5,10 +5,12 @@
 ;-------------------------------------------------------------------------------
             .cdecls C,LIST,"msp430.h"       ; Include device header file
 			.global MOD,SHUFFLE,RAND_UPD,LED1_ON,LED0_ON,LED1_OFF,LED0_OFF
+			.global ARR_LEN,ARR,ARR_OUT,ATTEMPTS
           	.data
-ARR_LEN		.byte	9
-ARR			.word	6, 1, 3, 4, 2, 9, 8, 5, 7
-ARR_OUT		.word	0, 0, 0, 0, 0, 0, 0, 0, 0
+ARR_LEN		.byte	7
+ARR			.word	6, 1, 3, 4, 2, 9, 8
+ARR_OUT		.space  14
+ATTEMPTS    .field  20
 
 ;-------------------------------------------------------------------------------
             .def    RESET                   ; Export program entry-point to
@@ -47,14 +49,10 @@ StopWDT     mov.w   #WDTPW|WDTHOLD,&WDTCTL  				; Stop watchdog timer
 			mov.w	#BIT1|BIT0,&P1DIR						; Setup LED output
 
             mov.w   #NWAITS_1|FRCTLPW,&FRCTL0               ; Enable FRAM wait states, faster clock
+            mov.w   #CSKEY,&CSCTL0                          ; Unlock clock registers
 			mov.w   #DCOFSEL_4|DCORSEL,&CSCTL1              ; 16MHz mode
+			bic.w   #DIVM,&CSCTL3                           ; MCLK divider = 1
 
-			; Array setup
-			mov.w 	#6,&ARR
-			mov.w	#1,&ARR+2
-			mov.w	#3,&ARR+4
-			mov.w	#4,&ARR+6
-			mov.w	#2,&ARR+8
 ;-------------------------------------------------------------------------------
 ; Main loop here
 ;-------------------------------------------------------------------------------
@@ -67,6 +65,7 @@ StopWDT     mov.w   #WDTPW|WDTHOLD,&WDTCTL  				; Stop watchdog timer
 			jmp		CHK
 RUN			call	#LED0_ON
 			call 	#SHUFFLE
+			incx.a  &ATTEMPTS
 			call	#LED0_OFF
 CHK			call	#LED1_ON		; Turn on LED 1 (indicating chk_sort happening)
 			call	#CHK_SORT
